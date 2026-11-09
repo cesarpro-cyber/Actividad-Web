@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taller Automotriz "El Pistón"</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pocketbase@0.21.1/dist/pocketbase.umd.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans">
+
+    <!-- Header -->
+    <header class="bg-slate-900 text-white shadow-md">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold tracking-wide">🚗 Taller "El Pistón"</h1>
+            <span id="connection-status" class="text-xs px-2 py-1 rounded bg-amber-500 text-white">Conectando...</span>
+        </div>
+    </header>
+
+    <!-- Navegación por pestañas -->
+    <nav class="bg-white shadow border-b">
+        <div class="container mx-auto px-4 flex space-x-6 overflow-x-auto">
+            <button onclick="switchTab('ordenes')" class="tab-btn py-3 px-4 font-semibold text-blue-600 border-b-2 border-blue-600">Órdenes Activas</button>
+            <button onclick="switchTab('clientes')" class="tab-btn py-3 px-4 font-semibold text-slate-600 hover:text-blue-600">Clientes y Vehículos</button>
+            <button onclick="switchTab('inventario')" class="tab-btn py-3 px-4 font-semibold text-slate-600 hover:text-blue-600">Inventario y Alertas</button>
+            <button onclick="switchTab('mecanicos')" class="tab-btn py-3 px-4 font-semibold text-slate-600 hover:text-blue-600">Carga Mecánicos</button>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <main class="container mx-auto px-4 py-6">
+        
+        <!-- Pestaña: Órdenes -->
+        <section id="tab-ordenes" class="tab-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold">Gestión de Órdenes de Servicio</h2>
+                <button onclick="openModal('modal-orden')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow font-medium">+ Nueva Orden</button>
+            </div>
+            <div id="lista-ordenes" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <!-- Se llena dinámicamente -->
+            </div>
+        </section>
+
+        <!-- Pestaña: Clientes -->
+        <section id="tab-clientes" class="tab-content hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold">Clientes con Saldo Pendiente e Historial</h2>
+                <button onclick="openModal('modal-cliente')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow font-medium">+ Nuevo Cliente</button>
+            </div>
+            <div class="bg-white rounded shadow overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-200 text-slate-700 uppercase text-xs">
+                        <tr>
+                            <th class="p-3">Cliente</th>
+                            <th class="p-3">Teléfono</th>
+                            <th class="p-3">Dirección</th>
+                            <th class="p-3">Saldo Pendiente</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-clientes" class="divide-y divide-slate-100 text-sm">
+                        <!-- Se llena dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Pestaña: Inventario -->
+        <section id="tab-inventario" class="tab-content hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold">Inventario de Repuestos (Alertas de Stock Bajo)</h2>
+                <button onclick="openModal('modal-repuesto')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow font-medium">+ Nuevo Repuesto</button>
+            </div>
+            <div id="lista-repuestos" class="grid gap-4 md:grid-cols-3">
+                <!-- Se llena dinámicamente -->
+            </div>
+        </section>
+
+        <!-- Pestaña: Mecánicos -->
+        <section id="tab-mecanicos" class="tab-content hidden">
+            <h2 class="text-xl font-bold mb-6">Carga de Trabajo por Mecánico</h2>
+            <div id="carga-mecanicos" class="grid gap-4 md:grid-cols-2">
+                <!-- Se llena dinámicamente -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal Orden -->
+    <div id="modal-orden" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg p-6 w-full max-w-lg shadow-xl">
+            <h3 class="text-lg font-bold mb-4">Crear Nueva Orden de Servicio</h3>
+            <form id="form-orden" onsubmit="guardarOrden(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium">ID Vehículo</label>
+                    <input type="text" id="vehiculo_id" required class="w-full border rounded p-2 text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium">ID Mecánico</label>
+                    <input type="text" id="mecanico_id" required class="w-full border rounded p-2 text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium">Problema Reportado</label>
+                    <textarea id="problema" required class="w-full border rounded p-2 text-sm"></textarea>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" onclick="closeModal('modal-orden')" class="bg-slate-300 px-4 py-2 rounded text-sm">Cancelar</button>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded text-sm">Guardar Orden</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
